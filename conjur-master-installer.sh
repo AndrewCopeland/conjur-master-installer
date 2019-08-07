@@ -36,16 +36,16 @@ function create_conjur_master_rhel_7_6() {
     conjur_image=$(echo $conjur_image | sed 's/Loaded image: //')
 
     # start the conjur master
-    docker network create conjur
+    docker network create $DOCKER_NETWORK_NAME
     docker container run -d --name $CONJUR_MASTER_NAME --network $DOCKER_NETWORK_NAME --restart=always --security-opt=seccomp:unconfined -p 443:443 -p 5432:5432 -p 1999:1999 $conjur_image
     docker exec $CONJUR_MASTER_NAME evoke configure master --hostname $CONJUR_MASTER_NAME --admin-password $ADMIN_PASSWORD $CONJUR_ACCOUNT
 }
 
 function create_and_configure_conjur_cli() {
     #create CLI container
-    sudo docker container run -d --name conjur-cli --network $DOCKER_NETWORK_NAME --restart=always --entrypoint "" cyberark/conjur-cli:5 sleep infinity
-    sudo docker exec -i conjur-cli conjur init --account $company_name --url https://$master_name <<< yes
-    sudo docker exec conjur-cli conjur authn login -u admin -p $admin_password
+    docker container run -d --name conjur-cli --network $DOCKER_NETWORK_NAME --restart=always --entrypoint "" cyberark/conjur-cli:5 sleep infinity
+    docker exec -i conjur-cli conjur init --account $CONJUR_ACCOUNT --url https://$CONJUR_MASTER_NAME <<< yes
+    docker exec conjur-cli conjur authn login -u admin -p $ADMIN_PASSWORD
 }
 
 function install_conjur() {
@@ -59,6 +59,11 @@ function install_conjur() {
         create_and_configure_conjur_cli
         ;;
     esac
+}
+
+function delete_conjur() {
+    docker rm -f $(docker ps -a -q)
+    docker rmi 
 }
 
 install_conjur
