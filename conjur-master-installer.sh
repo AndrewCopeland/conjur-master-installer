@@ -48,15 +48,19 @@ function create_and_configure_conjur_cli() {
     docker exec conjur-cli conjur authn login -u admin -p $ADMIN_PASSWORD
 }
 
+function install_conjur_rhel_7_6() {
+    install_dependancies_rhel_7_6
+    create_conjur_master_rhel_7_6
+    create_and_configure_conjur_cli
+}
+
 function install_conjur() {
     os_type=$(get_os_type)
     echo "OS: $os_type"
 
     case $(echo "$os_type") in
     'rhel 7.6' )
-        install_dependancies_rhel_7_6
-        create_conjur_master_rhel_7_6
-        create_and_configure_conjur_cli
+        install_conjur_rhel_7_6
         ;;
     esac
 }
