@@ -54,6 +54,12 @@ function install_conjur_rhel_7_6() {
     create_and_configure_conjur_cli
 }
 
+function install_conjur_rhel_7_1() {
+    install_dependancies_rhel_7_6
+    create_conjur_master_rhel_7_6
+    create_and_configure_conjur_cli
+}
+
 function install_conjur() {
     os_type=$(get_os_type)
     echo "OS: $os_type"
@@ -61,6 +67,9 @@ function install_conjur() {
     case $(echo "$os_type") in
     'rhel 7.6' )
         install_conjur_rhel_7_6
+        ;;
+    'rhel 7.1' )
+        install_conjur_rhel_7_1
         ;;
     esac
 }
