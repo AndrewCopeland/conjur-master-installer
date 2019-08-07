@@ -3,18 +3,18 @@ source ./config.env
 
 function get_os_id() {
     os_id=$(cat /etc/*-release | grep "^ID=" | awk -F '"' '{print $2}')
-    return $os_id
+    echo "$os_id"
 }
 
 function get_os_version() {
     version=$(cat /etc/*-release | grep "^VERSION_ID=" | awk -F '"' '{print $2}')
-    return $version
+    echo "$version"
 }
 
 function get_os_type() {
     os=$(get_os_id)
     version=$(get_os_version)
-    return "$os $version"
+    echo "$os $version"
 }
 
 function install_dependancies_rhel_7_6() {
