@@ -25,6 +25,8 @@ if [ $# -ne 3 ]; then
     exit 1
 fi
 
+rm -r $POLICY_DIR
+mkdir policies
 
 # Replace the placeholders
 sed "s/{{ SERVICE_ID }}/$SERVICE_ID/g" $TEMPLATE_AUTHN_IAM > $POLICY_AUTHN_IAM
@@ -36,8 +38,9 @@ sed "s/{{ AWS_ACCOUNT }}/$AWS_ACCOUNT/g" $TEMPLATE_AUTHN_GRANT |
     sed "s/{{ IAM_ROLE_NAME }}/$IAM_ROLE_NAME/g" |
     sed "s/{{ SERVICE_ID }}/$SERVICE_ID/g" > $POLICY_AUTHN_GRANT
 
+docker exec conjur-cli rm -r /$POLICY_DIR
 # Copy policies to conjur cli
-docker cp ./policies conjur-cli:/policies
+docker cp "./$POLICY_DIR" conjur-cli:/$POLICY_DIR
 
 # Load each of the policies
 docker exec conjur-cli conjur policy load root $POLICY_AUTHN_IAM
