@@ -35,16 +35,15 @@ sed "s/{{ AWS_ACCOUNT }}/$AWS_ACCOUNT/g" $TEMPLATE_AUTHN_AWS_PORTAL |
 
 sed "s/{{ AWS_ACCOUNT }}/$AWS_ACCOUNT/g" $TEMPLATE_AUTHN_GRANT | 
     sed "s/{{ IAM_ROLE_NAME }}/$IAM_ROLE_NAME/g" |
-    sed "s/{{ SERVICE_ID }}/$SERVICE_ID/g" > $POLICY_AUTHN_AWS_PORTAL
+    sed "s/{{ SERVICE_ID }}/$SERVICE_ID/g" > $POLICY_AUTHN_GRANT
 
 # Copy policies to conjur cli
 docker cp ./policies conjur-cli:/policies
 
 # Load each of the policies
-conjur-cli 
+docker exec conjur-cli conjur policy load root $POLICY_AUTHN_IAM
 docker exec conjur-cli conjur policy load root $POLICY_AUTHN_AWS_PORTAL
-docker exec conjur-cli conjur policy load root $POLICY_AUTHN_AWS_PORTAL
-docker exec conjur-cli conjur policy load root $POLICY_AUTHN_AWS_PORTAL
+docker exec conjur-cli conjur policy load root $POLICY_AUTHN_GRANT
 
 # update the conjur master environment variables
 res=$(docker exec conjur-master cat $CONJUR_CONFIG_FILE | grep "CONJUR_AUTHENTICATORS")
