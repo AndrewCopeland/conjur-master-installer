@@ -7,7 +7,7 @@
 
   # Create a layer to hold this application's hosts
   - !layer
-  
+
   # The host ID is the AWS acct # & IAM role we wish to authenticate.
   - !host {{ AWS_ACCOUNT }}/{{ IAM_ROLE_NAME }}
 
@@ -20,7 +20,7 @@
   # Give the `secrets-users` group permission to retrieve variables
   - !permit
     role: !layer
-    privilege: [ read, execute ]
+    privilege: [ read, execute, update ]
     resource: *variables
 
 
