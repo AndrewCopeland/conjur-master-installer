@@ -8,5 +8,8 @@ print(resources)
 conjur_client.set("aws-portal/database/username", "Username")
 conjur_client.set("aws-portal/database/password", "P@55W0RD123")
 
-print(conjur_client.get("aws-portal/database/username"))
-print(conjur_client.get("aws-portal/database/password"))
+db_username=conjur_client.get("aws-portal/database/username")
+db_password=conjur_client.get("aws-portal/database/password")
+
+print("Username: {}".format(db_username))
+print("Password: {}".format(db_password))
