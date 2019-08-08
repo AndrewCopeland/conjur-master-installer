@@ -17,7 +17,7 @@ function get_os_type() {
     echo "$os $version"
 }
 
-function install_dependancies_rhel_7_6() {
+function install_dependancies_rhel() {
     yum update -y
     yum install -y http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.74-1.el7.noarch.rpm
     yum install yum-utils device-mapper-persistent-data lvm2 -y
@@ -29,7 +29,7 @@ function install_dependancies_rhel_7_6() {
     systemctl enable /usr/lib/systemd/system/docker.service
 }
 
-function create_conjur_master_rhel_7_6() {
+function create_conjur_master_rhel_7() {
     # get the image we will be using for the conjur master
     tarname=$(find conjur-app*)
     conjur_image=$(sudo docker load -i $tarname)
@@ -48,35 +48,43 @@ function create_and_configure_conjur_cli() {
     docker exec conjur-cli conjur authn login -u admin -p $ADMIN_PASSWORD
 }
 
-function install_conjur_rhel_7_6() {
-    install_dependancies_rhel_7_6
-    create_conjur_master_rhel_7_6
+function install_conjur_rhel_7() {
+    install_dependancies_rhel
+    create_conjur_master_rhel_7
     create_and_configure_conjur_cli
 }
 
-function install_conjur_rhel_7_1() {
-    install_dependancies_rhel_7_6
-    create_conjur_master_rhel_7_6
-    create_and_configure_conjur_cli
-}
+function validate_no_arm() {
+    which_bash=$(which bash)
+    arm=$(file $which_bash | grep ARM)
 
-function install_conjur() {
-    os_type=$(get_os_type)
-    echo "OS: $os_type"
-
-    case $(echo "$os_type") in
-    'rhel 7.6' )
-        install_conjur_rhel_7_6
-        ;;
-    'rhel 7.1' )
-        install_conjur_rhel_7_1
-        ;;
-    esac
+    if [ "$arm" != "" ]; then
+        echo "ARM is not supported for conjur"
+        exit 1
+    fi
 }
 
 function delete_conjur() {
     docker rm -f $(docker ps -a -q)
-    docker rmi 
+    docker rmi -f $(docker images -q)
+}
+
+function install_conjur() {
+    validate_no_arm
+
+    os_type=$(get_os_type)
+    echo "OS: $os_type"
+
+    delete_conjur
+
+    case $(echo "$os_type") in
+    'rhel 7.1' )
+        install_conjur_rhel_7
+        ;;
+    'rhel 7.7' )
+        install_conjur_rhel_7
+        ;;
+    esac
 }
 
 install_conjur
