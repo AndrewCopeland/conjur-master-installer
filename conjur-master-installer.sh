@@ -79,6 +79,14 @@ function set_env_var_for_conjur_client() {
     export CONJUR_AUTHN_LOGIN=host/aws-portal/$AWS_ACCOUNT/$IAM_ROLE_NAME
     export CONJUR_CERT_FILE=./conjur-$CONJUR_ACCOUNT.pem
     export CONJUR_ACCOUNT=$CONJUR_ACCOUNT
+
+cat << EOF
+export CONJUR_APPLIANCE_URL=https://$CONJUR_MASTER_NAME
+export AUTHN_IAM_SERVICE_ID=$SERVICE_ID
+export CONJUR_AUTHN_LOGIN=host/aws-portal/$AWS_ACCOUNT/$IAM_ROLE_NAME
+export CONJUR_CERT_FILE=./conjur-$CONJUR_ACCOUNT.pem
+export CONJUR_ACCOUNT=$CONJUR_ACCOUNT
+EOF
 }
 
 function install_conjur() {
