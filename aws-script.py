@@ -23,4 +23,4 @@ for secret in all_secrets:
 
 # fetching the conjur secrets
 for secret in all_secrets:
-    print("{}: {}".format(secret, conjur_client.get(secret))
+    print("{}: {}".format(secret, conjur_client.get(secret)))
