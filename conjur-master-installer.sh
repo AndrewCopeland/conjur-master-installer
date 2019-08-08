@@ -73,6 +73,12 @@ function get_conjur_cert() {
     docker cp conjur-cli:/root/conjur-$CONJUR_ACCOUNT.pem ./
 }
 
+function add_conjur_to_hosts() {
+    if [ "$(cat /etc/hosts | grep "$CONJUR_MASTER_NAME")" == "" ]; then
+        echo "127.0.0.1    $CONJUR_MASTER_NAME" >> /etc/hosts
+    fi
+}
+
 function install_conjur() {
     validate_no_arm
 
@@ -91,12 +97,9 @@ function install_conjur() {
     esac
 
     # add conjur master to hosts file
-    echo "127.0.0.1    $CONJUR_MASTER_NAME" >> /etc/hosts
+    add_conjur_to_hosts
 
     get_conjur_cert
-
-    # set the environment variables needed for the python3 client
-    set_env_var_for_conjur_client
 }
 
 install_conjur
