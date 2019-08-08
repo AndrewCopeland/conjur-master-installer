@@ -69,6 +69,18 @@ function delete_conjur() {
     docker rmi -f $(docker images -q)
 }
 
+function get_conjur_cert() {
+    docker cp conjur-cli:/root/conjur-$CONJUR_ACCOUNT.pem ./
+}
+
+function set_env_var_for_conjur_client() {
+    export CONJUR_APPLIANCE_URL=https://$CONJUR_MASTER_NAME
+    export AUTHN_IAM_SERVICE_ID=$SERVICE_ID
+    export CONJUR_AUTHN_LOGIN=host/aws-portal/$AWS_ACCOUNT/$IAM_ROLE_NAME
+    export CONJUR_CERT_FILE=./conjur-$CONJUR_ACCOUNT.pem
+    export CONJUR_ACCOUNT=$CONJUR_ACCOUNT
+}
+
 function install_conjur() {
     validate_no_arm
 
@@ -85,6 +97,14 @@ function install_conjur() {
         install_conjur_rhel_7
         ;;
     esac
+
+    # add conjur master to hosts file
+    echo "127.0.0.1    $CONJUR_MASTER_NAME" >> /etc/hosts
+
+    get_conjur_cert
+
+    # set the environment variables needed for the python3 client
+    set_env_var_for_conjur_client
 }
 
 install_conjur

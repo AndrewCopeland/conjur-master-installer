@@ -1,0 +1,7 @@
+# add host to group authorized to call the authn-iam service
+- !grant
+  roles:
+  - !group conjur/authn-iam/{{ SERVICE_ID }}/clients
+  members:
+  - !host aws-portal/{{ AWS_ACCOUNT }}/{{ IAM_ROLE_NAME }}
+
