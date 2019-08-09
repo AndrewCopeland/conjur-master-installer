@@ -47,20 +47,6 @@ docker exec conjur-cli conjur policy load root $POLICY_AUTHN_IAM
 docker exec conjur-cli conjur policy load root $POLICY_AUTHN_AWS_PORTAL
 docker exec conjur-cli conjur policy load root $POLICY_AUTHN_GRANT
 
-# update the conjur master environment variables
-res=$(docker exec conjur-master cat $CONJUR_CONFIG_FILE | grep "CONJUR_AUTHENTICATORS")
-if [ "$res" == "" ]; then
-    authenticators=$(echo "CONJUR_AUTHENTICATORS=authn,authn-iam/$SERVICE_ID")
-    docker exec conjur-master bash -c "echo $authenticators | tee -a $CONJUR_CONFIG_FILE"
-else
-    authenticators=$(echo "$res,authn-iam/$SERVICE_ID")
-    conjurConfig=$(docker exec conjur-master cat $CONJUR_CONFIG_FILE | grep -v "CONJUR_AUTHENTICATORS")
-    docker exec conjur-master bash -c "echo $conjurConfig | tee $CONJUR_CONFIG_FILE"
-    docker exec conjur-master bash -c "echo $authenticators | tee -a $CONJUR_CONFIG_FILE"
-fi
-
-# Restart conjur master
-docker exec conjur-master sv restart conjur
 
 # Get the environment variables needed for AWS
 echo "Environment Variables for AWS instance"
